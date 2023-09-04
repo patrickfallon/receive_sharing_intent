@@ -126,8 +126,14 @@ public class SwiftReceiveSharingIntentPlugin: NSObject, FlutterPlugin, FlutterSt
                         guard let path = getAbsolutePath(for: $0.path) else {
                             return nil
                         }
+                        if ($0.path.starts(with: "file://") || identifier.starts(with: "/var/mobile/Media") || identifier.starts(with: "/private/var/mobile")) {
+                            return identifier.replacingOccurrences(of: "file://", with: "")
+                        }
                         if ($0.type == .video && $0.thumbnail != nil) {
-                            let thumbnail = getAbsolutePath(for: $0.thumbnail!)
+                           // let thumbnail = getAbsolutePath(for: $0.thumbnail!)
+                            if ($0.thumbnail.starts(with: "file://") || identifier.starts(with: "/var/mobile/Media") || identifier.starts(with: "/private/var/mobile")) {
+                            return identifier.replacingOccurrences(of: "file://", with: "")
+                        }
                             return SharedMediaFile.init(path: path, thumbnail: thumbnail, duration: $0.duration, type: $0.type)
                         } else if ($0.type == .video && $0.thumbnail == nil) {
                             return SharedMediaFile.init(path: path, thumbnail: nil, duration: $0.duration, type: $0.type)
@@ -148,6 +154,9 @@ public class SwiftReceiveSharingIntentPlugin: NSObject, FlutterPlugin, FlutterSt
                     let sharedMediaFiles: [SharedMediaFile] = sharedArray.compactMap{
                         guard let path = getAbsolutePath(for: $0.path) else {
                             return nil
+                        }
+                        if ($0.path.starts(with: "file://") || identifier.starts(with: "/var/mobile/Media") || identifier.starts(with: "/private/var/mobile")) {
+                            return identifier.replacingOccurrences(of: "file://", with: "")
                         }
                         let pathWithoutPrefix = String($0.path.dropFirst(7))//knock 'file://' off here...
                         return SharedMediaFile.init(path: pathWithoutPrefix, thumbnail: nil, duration: nil, type: $0.type)
